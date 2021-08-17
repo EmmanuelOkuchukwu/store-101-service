@@ -54,23 +54,20 @@ exports.delete_user = async (req, res) => {
 
 exports.update_user = async (req, res) => {
     try {
+        const { _id } = req.params.id;
         const { firstName, lastName, storeBranch, occupation, dob } = req.body;
-        await User.updateOne({ _id: req.params.id }, {
+        if(!firstName || !lastName || !storeBranch || !occupation || !dob) {
+            return res.status(422).json({ message: 'Include fields' })
+        }
+        const user = new User({
             firstName,
             lastName,
             storeBranch,
             occupation,
             dob
-        }, (error) =>
-        {
-            if(error) {
-                res.status(401).json({ error: error })
-            } else {
-                return res.status(200).json({
-                    message: 'Successfully updated a staff 😀!'
-                });
-            }
         })
+        await user.updateOne(_id)
+        return res.status(200).json({ message: 'Successfully updated a staff 👍!' });
     } catch(err) {
         console.log(err);
         return res.status(401).json({ error: err });
